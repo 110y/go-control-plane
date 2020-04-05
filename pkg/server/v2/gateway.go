@@ -56,6 +56,8 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) err
 		typeURL = resource.SecretType
 	case resource.FetchRuntimes:
 		typeURL = resource.RuntimeType
+	case resource.FetchVirtualHosts:
+		typeURL = resource.VirtualHostType
 	default:
 		http.Error(resp, "no endpoint", http.StatusNotFound)
 		return fmt.Errorf("no endpoint")

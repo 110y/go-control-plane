@@ -31,5 +31,6 @@ const (
 	Listener
 	Secret
 	Runtime
+	VirtualHost
 	UnknownType // token to count the total number of supported types
 )

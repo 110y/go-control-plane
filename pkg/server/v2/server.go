@@ -96,26 +96,29 @@ type stream interface {
 
 // watches for all xDS resource types
 type watches struct {
-	endpoints chan cache.Response
-	clusters  chan cache.Response
-	routes    chan cache.Response
-	listeners chan cache.Response
-	secrets   chan cache.Response
-	runtimes  chan cache.Response
+	endpoints    chan cache.Response
+	clusters     chan cache.Response
+	routes       chan cache.Response
+	listeners    chan cache.Response
+	secrets      chan cache.Response
+	runtimes     chan cache.Response
+	virtualHosts chan cache.Response
 
-	endpointCancel func()
-	clusterCancel  func()
-	routeCancel    func()
-	listenerCancel func()
-	secretCancel   func()
-	runtimeCancel  func()
+	endpointCancel    func()
+	clusterCancel     func()
+	routeCancel       func()
+	listenerCancel    func()
+	secretCancel      func()
+	runtimeCancel     func()
+	virtualHostCancel func()
 
-	endpointNonce string
-	clusterNonce  string
-	routeNonce    string
-	listenerNonce string
-	secretNonce   string
-	runtimeNonce  string
+	endpointNonce    string
+	clusterNonce     string
+	routeNonce       string
+	listenerNonce    string
+	secretNonce      string
+	runtimeNonce     string
+	virtualHostNonce string
 }
 
 // Cancel all watches
@@ -137,6 +140,9 @@ func (values watches) Cancel() {
 	}
 	if values.runtimeCancel != nil {
 		values.runtimeCancel()
+	}
+	if values.virtualHostCancel != nil {
+		values.virtualHostCancel()
 	}
 }
 
@@ -221,7 +227,7 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 	}
 
 	// node may only be set on the first discovery request
-	var node = &core.Node{}
+	node := &core.Node{}
 
 	for {
 		select {
@@ -287,6 +293,16 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 				return err
 			}
 			values.runtimeNonce = nonce
+
+		case resp, more := <-values.virtualHosts:
+			if !more {
+				return status.Errorf(codes.Unavailable, "virtual hosts watch failed")
+			}
+			nonce, err := send(resp, resource.VirtualHostType)
+			if err != nil {
+				return err
+			}
+			values.virtualHostNonce = nonce
 
 		case req, more := <-reqCh:
 			// input stream ended or errored out

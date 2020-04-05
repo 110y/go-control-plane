@@ -27,18 +27,20 @@ import (
 )
 
 const (
-	clusterName  = "cluster0"
-	routeName    = "route0"
-	listenerName = "listener0"
-	runtimeName  = "runtime0"
+	clusterName     = "cluster0"
+	routeName       = "route0"
+	listenerName    = "listener0"
+	runtimeName     = "runtime0"
+	virtualHostName = "virtual_host0"
 )
 
 var (
-	testEndpoint = resource.MakeEndpoint(clusterName, 8080)
-	testCluster  = resource.MakeCluster(resource.Ads, clusterName)
-	testRoute    = resource.MakeRoute(routeName, clusterName)
-	testListener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	testRuntime  = resource.MakeRuntime(runtimeName)
+	testEndpoint    = resource.MakeEndpoint(clusterName, 8080)
+	testCluster     = resource.MakeCluster(resource.Ads, clusterName)
+	testRoute       = resource.MakeRoute(routeName, clusterName)
+	testListener    = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testRuntime     = resource.MakeRuntime(runtimeName)
+	testVirtualHost = resource.MakeVirtualHost(virtualHostName)
 )
 
 func TestValidate(t *testing.T) {
@@ -109,8 +111,10 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[string]bool{clusterName: true},
 		},
 		{
-			in: &cluster.Cluster{Name: clusterName, ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
-				EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{ServiceName: "test"}},
+			in: &cluster.Cluster{
+				Name: clusterName, ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
+				EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{ServiceName: "test"},
+			},
 			out: map[string]bool{"test": true},
 		},
 		{

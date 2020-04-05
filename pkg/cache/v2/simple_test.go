@@ -51,7 +51,9 @@ var (
 		[]types.Resource{testCluster},
 		[]types.Resource{testRoute},
 		[]types.Resource{testListener},
-		[]types.Resource{testRuntime})
+		[]types.Resource{testRuntime},
+		[]types.Resource{testVirtualHost},
+	)
 
 	names = map[string][]string{
 		rsrc.EndpointType: []string{clusterName},

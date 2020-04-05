@@ -59,10 +59,8 @@ const (
 	Rest = "rest"
 )
 
-var (
-	// RefreshDelay for the polling config source
-	RefreshDelay = 500 * time.Millisecond
-)
+// RefreshDelay for the polling config source
+var RefreshDelay = 500 * time.Millisecond
 
 // MakeEndpoint creates a localhost endpoint on a given port.
 func MakeEndpoint(clusterName string, port uint32) *endpoint.ClusterLoadAssignment {
@@ -288,6 +286,14 @@ func MakeRuntime(runtimeName string) *runtime.Runtime {
 	}
 }
 
+// MakeVirtualHost creates an VHDS layer with some fields.
+func MakeVirtualHost(name string) *routev2.VirtualHost {
+	return &routev2.VirtualHost{
+		Name: name,
+		// TODO:
+	}
+}
+
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
 	// Xds indicates snapshot mode: ads, xds, or rest
@@ -308,6 +314,8 @@ type TestSnapshot struct {
 	// NumRuntimes is the total number of RTDS layers to generate.
 	NumRuntimes int
 	// TLS enables SDS-enabled TLS mode on all listeners
+	NumVirtualHosts int
+	// // TODO:
 	TLS bool
 }
 
@@ -376,6 +384,8 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		runtimes[i] = MakeRuntime(name)
 	}
 
+	virtualHosts := make([]types.Resource, ts.NumVirtualHosts) // TODO:
+
 	out := cache.NewSnapshot(
 		ts.Version,
 		endpoints,
@@ -383,6 +393,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		routes,
 		listeners,
 		runtimes,
+		virtualHosts,
 	)
 
 	if ts.TLS {
